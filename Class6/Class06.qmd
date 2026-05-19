@@ -1,0 +1,236 @@
+---
+title: "class 6: R functions"
+author: "Giselle Garcia A17995734"
+format: pdf 
+toc: true
+---
+
+## Background
+
+All function in R have at least 3 things:
+
+-   a *name* (we pick that and use it to call the fucntion) -Input *arguments* (one or more comma eperated inputs that got inside the brackets when we call the function) -the *body* (the lines of the R code that doe the woek of the function)
+
+## Afirst fucntion
+
+here we will create a function to add some numbers. Let's call it `add()`
+
+Input argument can be either **"required"** or **"optional"**. The later have fall-back default values that will be used if the user does not specify them.
+
+```{r}
+add<- function(x,y=0) {
+  x+y 
+}
+```
+
+Can we use our new function:
+
+```{r}
+add(10,100)
+```
+
+```{r}
+add(10)
+```
+
+> Q1b: For you second version, adapt your first function so it can take a single input vector or two inputs as before. For example, add(4, 7) and add ( c(4,7,10) ).
+
+```{r}
+add<- function(x,y=0) {
+  sum(x+y) 
+}
+add(4,7)
+```
+```{r}
+add(c(4,7,10))
+```
+
+>Q1c. Finally, on your own (outside of class) create a third version of your function that can add any number of inputs that the user provides. For example, add(1, 2, 3, -4)
+
+```{r}
+add<- function(x,y=0, z=0) {
+  sum(x,y,z)
+}
+```
+
+```{r}
+add(10,100)
+```
+
+```{r}
+ans <- add (1,2,3)
+ans
+```
+#this function adds any number of inputs provided
+```{r}
+add<- function(...) {
+  sum(...)
+}
+```
+
+```{r}
+add(1,2,3,-4)
+```
+
+We can explicitly set a **return** value output from a function (rather than the default last line) by using the `return()` function call.
+
+```{r}
+add<- function(x,y=0, z=0) {
+  return(sum(x,y,z))
+  cat("Is it break time yet")
+}
+```
+
+
+## A generate_dna() fucntion
+
+A useful function here is the "Base R" `sample()` function:
+
+```{r}
+sample(1:5, size=3)
+```
+
+We can use this to make a random nucleotide sequence if we draw "A", "C", "G" and "T"...
+
+```{r}
+sample(1:5, size=60, replace= TRUE)
+```
+
+We can use this to make a random nucleotide sequence if we draw from "A", "C", "G" and "T"...
+
+```{r}
+sample(x=c("A", "C", "G","T"), size= 10, replace= TRUE)
+```
+
+> **Q2a.** Your first version should return a multi-element vector of single character nucleotides. For example generate_dna(6) might return "A", "T", "T", "G", "A", "C".
+
+```{r}
+generate_dna <- function(len=10) {
+  sample(x=c("A", "C", "G", "T"), size= len, replace= TRUE)
+}
+```
+
+```{r}
+generate_dna()
+generate_dna(len=100)
+```
+
+> Q2b:Your second version should **optionally** be able to return either a multi-element vector of single character nucleotides (as before) or a **single character string** (not a vector of single letters but a singe vector of multiple letters).
+
+```{r}
+generate_dna <- function( len=10, single.element=TRUE) {
+  
+  ans <- sample(x=c("A", "C", "G", "T"), size=len, replace= TRUE)
+  
+  #cat("Hello...")
+  
+  if(single.element) {
+    #cat("is it me you are looking for...")
+    ans <- paste( ans, collapse = "")
+  }
+  return(ans)
+}
+```
+
+Functions that could be useful here are `paste()`, `if()`, `cat()`, and `return()`
+
+```{r}
+generate_dna()
+generate_dna(single.element = FALSE)
+```
+
+```{r}
+paste(c("A", "C", "G"), collapse = "")
+```
+
+> Q2C. Finally, create a final version of your function that prints out a FASTA format sequence with an id line indicating the sequence length.
+
+
+```{r}
+generate_dna <- function(len=10, single.element=TRUE, fasta=FALSE) {
+  
+  ans <-sample(x=c("A", "C", "G", "T"), size=len, replace = TRUE)
+  
+  if(fasta) {
+    seq_string <- paste(ans, collpase= "")
+    cat(">len", len, "\n", sep="")
+    cat(seq_string, "\n", sep="")
+    return(invisible(seq_string))
+  }
+  
+  if(single.element) {
+    ans <- paste(ans, collapse = "")
+  }
+  return(ans)
+}
+```
+
+```{r}
+generate_dna(9, fasta=TRUE)
+```
+
+
+## Write a `generate_protein()` fucntion
+
+> **Q3**. Write a function generate_protein() that returns a random peptide/protein sequence of a length specified by the user. For example generate_protein(6) might return "WQRTAG".
+
+```{r}
+generate_protein <- function(length=9) {
+  aa <- c ("A", "R", "N", "D", "C", "E", "Q", "G", "H", "I", "L", "K", "M", "F", "P", "S", "T", "W", "Y", "V") 
+  ans <- sample(x=aa, size=length, replace = TRUE)
+  ans <- paste(ans, collapse = "")
+  return(ans)
+}
+```
+
+```{r}
+generate_protein(6)
+```
+
+
+## Generate random protein sequences of length 6 to 13
+
+> **Q4** Adapt and use your generate_protein() function to generate a series of random protein sequences
+ranging from 6 to 13 amino acids in length (one sequence per length). 
+
+```{r}
+for(l in 6:13) {
+  cat(">id.", l, "\n", sep ="")
+  cat (generate_protein(l), "\n")
+}
+```
+
+## BLASTp search against nr — are your peptides “unique in nature”?
+
+> **Q5**: Take your FASTA-formatted peptides from Q4 and run them as a single BLASTp search against the Non-redundant protein sequences (nr) database
+
+| length | Ide | Cov | Unique |
+|--------|-----|-----|--------|
+| 6      | 100 |100  |  N     |
+| 7      | 100 |100  |  N     |
+| 8      | 100 |88   |  Y     |
+| 9      |100  |89   |  Y     |
+| 10     | 89  |90   |  Y     |
+| 11     |100  |82   |  Y     |
+| 12     |82   |92   |  Y     |
+| 13     |73   |100  |  Y     |
+
+> Q5a. At which sequence length do your randomly generated peptides start to look “unique in nature”(i.e. no 100% coverage + 100% identity hit)? [1 pt]
+
+Sequence Length 8
+
+
+
+> Q5b. Speculate why very short random peptides are almost always found in nr, while longer ones typically are not. [1 pt]
+
+Short peptides are easy to find in the database because there aren’t that many possible sequences (20^L), so they show up a lot in real proteins. But as the length increases, the number of possible sequences becomes huge compared to the number of known proteins, so longer peptides are less likely to match anything.
+
+
+# connecting your finding to Immunology
+
+>**Q6.**: In 3–6 sentences total and using your Q5 data and the reasoning from Q5b, what do you think this minimum length is and why might it be a bad design choice for the immune system to present very short peptides? [3 pt]
+
+Based on my Q5 results, peptides start to look unique around length ~8, so the minimum length for MHC class II presentation is likely around 9–10 amino acids. Very short peptides are not unique because the sequence space is small (20^L), meaning many identical sequences appear across different proteins. As peptide length increases, the sequence space grows rapidly, making matches less likely. If the immune system presented very short peptides, they would frequently match self-proteins, increasing the risk of autoimmune responses. So, longer peptides improve specificity and help T cells distinguish self from non-self.
+
+
+
