@@ -1,6 +1,6 @@
 # Bioinformatics Class
 
-My classwork from [BIMM143 at UC San Diego Spring 2026](gigi142441.github.io/bimm143_github/)
+My classwork from [BIMM143 at UC San Diego Spring 2026](https://bioboot.github.io/bimm143_S26/)
 
 ## Index of Classes 
 
